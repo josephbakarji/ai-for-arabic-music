@@ -1,3 +1,7 @@
+<script type="text/javascript" async
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
 # **Bayesian Framework for Mode Identification in Monophonic Music Using KDE and Interval Distributions**
 
 ## **1. Introduction**
