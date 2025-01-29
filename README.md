@@ -6,7 +6,7 @@ Musical mode identification is an essential problem in computational musicology,
 ## **2. Methodology**
 
 ### **2.1 Frequency Estimation and Log-Scale Transformation**
-Given an audio signal \( x(t) \), we extract the fundamental frequency \( f(t) \) over time using a pitch estimation algorithm, such as the constant-Q transform (CQT) or other Fourier-based methods. The estimated frequency is converted to a logarithmic scale in cents:
+Given an audio signal $ x(t) $, we extract the fundamental frequency \( f(t) \) over time using a pitch estimation algorithm, such as the constant-Q transform (CQT) or other Fourier-based methods. The estimated frequency is converted to a logarithmic scale in cents:
 
 \[
 c = 1200 \log_2 \left( \frac{f}{f_0} \right)
