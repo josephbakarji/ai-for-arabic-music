@@ -1,0 +1,100 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb, graphicx}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+
+\title{Bayesian Framework for Mode Identification in Monophonic Music Using KDE and Interval Distributions}
+\author{Your Name}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+Musical mode identification is a fundamental problem in computational musicology, particularly for non-Western tunings and modal systems such as \textit{maqam} or \textit{raga}. Traditional approaches rely on symbolic encodings, rule-based heuristics, or time-series modeling using Markov chains. This paper proposes a probabilistic framework leveraging Kernel Density Estimation (KDE) to obtain pitch distributions, derive interval distributions, and apply Bayesian inference for real-time mode recognition.
+
+\section{Methodology}
+
+\subsection{Frequency Estimation and Log-Scale Transformation}
+Given an audio signal $x(t)$, we extract the fundamental frequency $f(t)$ using pitch estimation techniques such as the constant-Q transform (CQT) or Fourier-based methods. The frequency is then converted to a logarithmic scale in cents:
+\begin{equation}
+    c = 1200 \log_2 \left( \frac{f}{f_0} \right)
+\end{equation}
+where $f_0$ is a reference frequency, typically A4 = 440 Hz. This transformation ensures equal-ratio intervals appear as equal differences in the transformed space.
+
+\subsection{Kernel Density Estimation of Pitch Distribution}
+Since musical notes exhibit variability due to tuning, vibrato, and performance nuances, the observed pitch distribution is continuous rather than discrete. We model this distribution using KDE:
+\begin{equation}
+    p(c) = \frac{1}{N} \sum_{i=1}^{N} K_h(c - c_i)
+\end{equation}
+where $K_h$ is a Gaussian kernel function with bandwidth $h$. Peaks in $p(c)$ correspond to stable pitch centers in the performance.
+
+\subsection{Interval Distribution from Pitch Distribution}
+From the KDE-derived pitch distribution, we compute the probability distribution of interval differences. Since our frequencies are already converted to log-space, the probability of an interval $\Delta = \log f - \log f'$ can be derived from the pitch distribution $p(c)$ by transforming the probability density function:
+\begin{equation}\label{eq:interval_distribution}
+    p(\Delta) = \int p(c) p(c + \Delta) \left| \frac{d c}{d f} \right| dc \quad \text{(Interval Distribution Formula)}
+\end{equation}
+
+Since $c = \log f$, we have $dc = \frac{df}{f}$, meaning that the transformation factor is simply:
+\begin{equation}
+    \left| \frac{d c}{d f} \right| = \frac{1}{f}.
+\end{equation}
+Thus, the probability of observing an interval difference is obtained by integrating over the transformed probability space. This captures the likelihood of observing particular pitch intervals, central to mode recognition. The dominant intervals define the modal structure of the music.
+
+Equation \ref{eq:interval_distribution} calculates the probability of finding a particular interval $\Delta$ in the music.
+It works by:
+\begin{enumerate}
+    \item Taking two points in the pitch distribution $p(c)$ that are separated by the interval $\Delta$
+    \item Multiplying their probabilities $p(c)p(c+\Delta)$ to get the joint probability
+    \item Integrating over all possible starting pitches $c$ to sum up all ways this interval could occur
+    \item Including the change of variables factor $|dc/df|$ to account for the logarithmic transformation
+\end{enumerate}
+
+The result tells us how likely we are to hear each interval in the music, which is crucial for mode identification.
+
+\subsection{Bayesian Inference for Mode Recognition}
+Given a hypothesis $H$ that a piece follows a particular mode (e.g., a maqam or raga), we seek the posterior probability:
+\begin{equation}
+    P(H \mid D) = \frac{P(D \mid H) P(H)}{P(D)}
+\end{equation}
+where:
+\begin{itemize}
+    \item $P(D \mid H)$ is the likelihood of observing the interval distribution $p(\Delta)$ given the hypothesized mode.
+    \item $P(H)$ is the prior probability of the mode, which can be informed by musical context or historical data.
+    \item $P(D)$ is a normalizing factor ensuring valid probabilities.
+\end{itemize}
+If each mode is characterized by a set of expected intervals $\mu_H$, we assume:
+\begin{equation}
+    P(D \mid H) = \prod_{k} \mathcal{N}(\Delta_k \mid \mu_{H,k}, \sigma^2).
+\end{equation}
+This allows observed intervals to be compared against theoretical expectations, dynamically updating mode probabilities as new notes are encountered.
+
+\subsection{Real-Time Bayesian Updating}
+As musical pieces evolve, we employ an online Bayesian update:
+\begin{equation}
+    P(H \mid D_{\text{new}}) \propto P(D_{\text{new}} \mid H) P(H \mid D_{\text{old}}).
+\end{equation}
+New pitch intervals refine the mode probabilities, enabling adaptive mode recognition.
+
+\section{Expected Contributions}
+This approach provides:
+\begin{enumerate}
+    \item \textbf{Continuous Pitch Representation}: KDE-based pitch distributions capture microtonal variations.
+    \item \textbf{Probabilistic Interval Modeling}: The use of interval distributions effectively represents modal music systems.
+    \item \textbf{Bayesian Mode Identification}: Real-time inference dynamically recognizes modes based on evolving pitch patterns.
+\end{enumerate}
+
+\section{Future Work}
+Future extensions may include:
+\begin{itemize}
+    \item Incorporating \textbf{Hidden Markov Models (HMMs)} to model sequential dependencies in melodic progressions.
+    \item Exploring \textbf{unsupervised learning} to cluster interval distributions into modal families.
+    \item Extending to \textbf{polyphonic music} using probabilistic polyphony tracking.
+\end{itemize}
+
+\section{References}
+Relevant literature includes Bayesian methods for music signal processing, scale degree modeling, and structural inference in music.
+
+\end{document}
